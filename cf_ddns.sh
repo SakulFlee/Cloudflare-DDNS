@@ -44,7 +44,7 @@ source /settings
 # Script variables (do not change)
 ################################################################
 CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-LAST_IP_FILE="$CWD/last_ip"
+LAST_IP_FILE="$CWD/ip.last"
 
 FORCE_DNS_UPDATE=0
 UPDATE_DNS=0
