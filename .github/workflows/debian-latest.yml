@@ -1,4 +1,4 @@
-name: Docker
+name: Docker - Debian-Latest
 on:
   schedule:
     - cron: "0 * * * *"

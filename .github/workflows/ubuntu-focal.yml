@@ -1,4 +1,4 @@
-name: Docker
+name: Docker - Ubuntu Focal
 on:
   schedule:
     - cron: "0 * * * *"

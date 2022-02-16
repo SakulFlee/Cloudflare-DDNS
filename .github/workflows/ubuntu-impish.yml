@@ -1,4 +1,4 @@
-name: Docker
+name: Docker - Ubuntu Impish
 on:
   schedule:
     - cron: "0 * * * *"

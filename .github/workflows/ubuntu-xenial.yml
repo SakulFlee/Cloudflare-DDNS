@@ -1,4 +1,4 @@
-name: Docker
+name: Docker - Ubuntu Xenial
 on:
   schedule:
     - cron: "0 * * * *"
