@@ -14,7 +14,7 @@ env:
   IMAGE_NAME: cloudflare_ddns
   DOCKER_IMAGE: debian
   DOCKER_IMAGE_VERSION: latest
-  TAGS: ${{ DOCKER_IMAGE }}:${{ DOCKER_IMAGE_VERSION }}
+  TAGS: latest
 
 jobs:
   build:

@@ -13,7 +13,7 @@ env:
   IMAGE_NAMESPACE: sakul6499
   IMAGE_NAME: cloudflare_ddns
   DOCKER_IMAGE: debian
-  DOCKER_IMAGE_VERSION: latest
+  DOCKER_IMAGE_VERSION: stretch
   TAGS: ${{ DOCKER_IMAGE }}:${{ DOCKER_IMAGE_VERSION }}
 
 jobs:
