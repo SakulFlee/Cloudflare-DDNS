@@ -1,21 +1,19 @@
 name: Docker
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
   push:
-    branches: [ main ]
-    tags: [ 'v*.*.*' ]
+    branches: [main]
+    tags: ["v*.*.*"]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,7 +28,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@1e95c1de343b5b0c23352d6417ee3e48d5bcd422
         with:
-          cosign-release: 'v1.4.0'
+          cosign-release: "v1.4.0"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -54,7 +52,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: debian-latest, latest
           labels: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          platforms: linux/amd64, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6
+          platforms: linux/amd64, linux/arm64, linux/386, linux/arm/v7, linux/arm/v6
           build-args: |
             base_image=debian
             base_image_version=latest
