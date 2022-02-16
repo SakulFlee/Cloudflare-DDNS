@@ -122,6 +122,7 @@ DNS=$(echo "$DNS_RESULT" | jq '[.result[] | select (.type == "A") | .]')
 ENTRIES=$(echo "$DNS" | jq length)
 echo "DNS: $DNS"
 echo "Entries: $ENTRIES"
+echo "Hostnames to be changed: ${HOSTNAMES[@]}"
 
 for ((i=0; i<ENTRIES; i++)); do
 	echo "Entry: #$i"
@@ -132,7 +133,7 @@ for ((i=0; i<ENTRIES; i++)); do
 	PROXIED=$(echo "$DNS" | jq ".[$i].proxied" | sed -e 's/^"//' -e 's/"$//')
 	echo "> #$ID [Type: $TYPE] ($NAME) {Proxied: $PROXIED}"
 
-    for hostname in $HOSTNAMES; do
+    for hostname in "${HOSTNAMES[@]}"; do
         if [ "$hostname" == "$NAME" ]; then
             echo "Matched: $hostname"
 
