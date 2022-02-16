@@ -6,79 +6,79 @@
         {
             "label": "Build w/ defaults (debian:latest)",
             "type": "shell",
-            "command": "docker build -t cf_ddns:latest .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:debian-latest .",
             "group": "build"
         },
         {
             "label": "Build w/ debian:bookworm",
             "type": "shell",
-            "command": "docker build -t cf_ddns:debian-bookworm --build-arg base_image=debian --build-arg base_image_version=bookworm .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:debian-bookworm --build-arg base_image=debian --build-arg base_image_version=bookworm .",
             "group": "build"
         },
         {
             "label": "Build w/ debian:bullseye",
             "type": "shell",
-            "command": "docker build -t cf_ddns:debian-bullseye --build-arg base_image=debian --build-arg base_image_version=bullseye .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:debian-bullseye --build-arg base_image=debian --build-arg base_image_version=bullseye .",
             "group": "build"
         },
         {
             "label": "Build w/ debian:buster",
             "type": "shell",
-            "command": "docker build -t cf_ddns:debian-buster --build-arg base_image=debian --build-arg base_image_version=buster .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:debian-buster --build-arg base_image=debian --build-arg base_image_version=buster .",
             "group": "build"
         },
         {
             "label": "Build w/ debian:sid",
             "type": "shell",
-            "command": "docker build -t cf_ddns:debian-sid --build-arg base_image=debian --build-arg base_image_version=sid .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:debian-sid --build-arg base_image=debian --build-arg base_image_version=sid .",
             "group": "build"
         },
         {
             "label": "Build w/ debian:stretch",
             "type": "shell",
-            "command": "docker build -t cf_ddns:debian-stretch --build-arg base_image=debian --build-arg base_image_version=stretch .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:debian-stretch --build-arg base_image=debian --build-arg base_image_version=stretch .",
             "group": "build"
         },
         {
             "label": "Build w/ ubuntu:latest",
             "type": "shell",
-            "command": "docker build -t cf_ddns:debian-stretch --build-arg base_image=debian --build-arg base_image_version=stretch .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:debian-stretch --build-arg base_image=debian --build-arg base_image_version=stretch .",
             "group": "build"
         },
         {
             "label": "Build w/ ubuntu:jammy (22.04)",
             "type": "shell",
-            "command": "docker build -t cf_ddns:ubuntu-jammy --build-arg base_image=ubuntu --build-arg base_image_version=jammy .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:ubuntu-jammy --build-arg base_image=ubuntu --build-arg base_image_version=jammy .",
             "group": "build"
         },
         {
             "label": "Build w/ ubuntu:impish (21.10)",
             "type": "shell",
-            "command": "docker build -t cf_ddns:ubuntu-impish --build-arg base_image=ubuntu --build-arg base_image_version=impish .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:ubuntu-impish --build-arg base_image=ubuntu --build-arg base_image_version=impish .",
             "group": "build"
         },
         {
             "label": "Build w/ ubuntu:focal (20.04)",
             "type": "shell",
-            "command": "docker build -t cf_ddns:ubuntu-focal --build-arg base_image=ubuntu --build-arg base_image_version=focal .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:ubuntu-focal --build-arg base_image=ubuntu --build-arg base_image_version=focal .",
             "group": "build"
         },
         {
             "label": "Build w/ ubuntu:bionic (18.04)",
             "type": "shell",
-            "command": "docker build -t cf_ddns:ubuntu-bionic --build-arg base_image=ubuntu --build-arg base_image_version=bionic .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:ubuntu-bionic --build-arg base_image=ubuntu --build-arg base_image_version=bionic .",
             "group": "build"
         },
         {
             "label": "Build w/ ubuntu:trusty (14.04)",
             "type": "shell",
-            "command": "docker build -t cf_ddns:ubuntu-trusty --build-arg base_image=ubuntu --build-arg base_image_version=trusty .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:ubuntu-trusty --build-arg base_image=ubuntu --build-arg base_image_version=trusty .",
             "group": "build"
         },
         {
             "label": "Build w/ ubuntu:xenial (16.04)",
             "type": "shell",
-            "command": "docker build -t cf_ddns:ubuntu-xenial --build-arg base_image=ubuntu --build-arg base_image_version=xenial .",
+            "command": "docker build -t ghcr.io/sakul6499/cloudflare_ddns:ubuntu-xenial --build-arg base_image=ubuntu --build-arg base_image_version=xenial .",
             "group": "build"
         },
         {
