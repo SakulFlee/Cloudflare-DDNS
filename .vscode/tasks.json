@@ -1,0 +1,104 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build w/ defaults (debian:latest)",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:latest .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ debian:bookworm",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:debian-bookworm --build-arg base_image=debian --build-arg base_image_version=bookworm .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ debian:bullseye",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:debian-bullseye --build-arg base_image=debian --build-arg base_image_version=bullseye .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ debian:buster",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:debian-buster --build-arg base_image=debian --build-arg base_image_version=buster .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ debian:sid",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:debian-sid --build-arg base_image=debian --build-arg base_image_version=sid .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ debian:stretch",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:debian-stretch --build-arg base_image=debian --build-arg base_image_version=stretch .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ ubuntu:latest",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:debian-stretch --build-arg base_image=debian --build-arg base_image_version=stretch .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ ubuntu:jammy (22.04)",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:ubuntu-jammy --build-arg base_image=ubuntu --build-arg base_image_version=jammy .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ ubuntu:impish (21.10)",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:ubuntu-impish --build-arg base_image=ubuntu --build-arg base_image_version=impish .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ ubuntu:focal (20.04)",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:ubuntu-focal --build-arg base_image=ubuntu --build-arg base_image_version=focal .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ ubuntu:bionic (18.04)",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:ubuntu-bionic --build-arg base_image=ubuntu --build-arg base_image_version=bionic .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ ubuntu:trusty (14.04)",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:ubuntu-trusty --build-arg base_image=ubuntu --build-arg base_image_version=trusty .",
+            "group": "build"
+        },
+        {
+            "label": "Build w/ ubuntu:xenial (16.04)",
+            "type": "shell",
+            "command": "docker build -t cf_ddns:ubuntu-xenial --build-arg base_image=ubuntu --build-arg base_image_version=xenial .",
+            "group": "build"
+        },
+        {
+            "label": "Build all",
+            "dependsOn": [
+                "Build w/ defaults (debian:latest)",
+                "Build w/ debian:bookworm",
+                "Build w/ debian:bullseye",
+                "Build w/ debian:buster",
+                "Build w/ debian:sid",
+                "Build w/ debian:stretch",
+                "Build w/ ubuntu:latest",
+                "Build w/ ubuntu:jammy (22.04)",
+                "Build w/ ubuntu:impish (21.10)",
+                "Build w/ ubuntu:focal (20.04)",
+                "Build w/ ubuntu:bionic (18.04)",
+                "Build w/ ubuntu:trusty (14.04)",
+                "Build w/ ubuntu:xenial (16.04)"
+            ],
+            "group": "build"
+        }
+    ]
+}
