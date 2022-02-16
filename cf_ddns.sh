@@ -130,7 +130,7 @@ for ((i=0; i<ENTRIES; i++)); do
 	TYPE=$(echo "$DNS" | jq ".[$i].type" | sed -e 's/^"//' -e 's/"$//')
 	NAME=$(echo "$DNS" | jq ".[$i].name" | sed -e 's/^"//' -e 's/"$//')
 	PROXIED=$(echo "$DNS" | jq ".[$i].proxied" | sed -e 's/^"//' -e 's/"$//')
-	echo "> $ID [$TYPE] ($NAME) {$PROXIED}"
+	echo "> #$ID [Type: $TYPE] ($NAME) {Proxied: $PROXIED}"
 
     for hostname in $HOSTNAMES; do
         if [ "$hostname" == "$NAME" ]; then
