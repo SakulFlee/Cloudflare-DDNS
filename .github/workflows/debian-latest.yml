@@ -11,6 +11,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  TAGS: debian-latest
 
 jobs:
   build:
@@ -49,13 +50,17 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: debian-latest, latest
+          load: true
+          push: false
+          tags: ${{ env.TAGS }}
           labels: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           platforms: linux/amd64, linux/arm64, linux/386, linux/arm/v7, linux/arm/v6
           build-args: |
             base_image=debian
             base_image_version=latest
+
+      - if: ${{ github.event_name != 'pull_request' }}
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAGS }}
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
