@@ -29,7 +29,7 @@ jobs:
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
 
       - name: Docker Build
-        run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAGS }} --build-arg base_image=debian base_image_version=latest
+        run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAGS }} --build-arg base_image=debian --build-arg base_image_version=latest
 
       - name: Docker Push
         if: ${{ github.event_name != 'pull_request' }}
