@@ -8,5 +8,6 @@ RUN apt-get update && \
     apt-get install -y bash jq sed dnsutils curl
 
 COPY cf_ddns.sh /cf_ddns.sh
+RUN chmod +x /cf_ddns.sh
 
-ENTRYPOINT [ "bash /cf_ddns.sh" ]
+CMD [ "/bin/bash", "/cf_ddns.sh" ]
