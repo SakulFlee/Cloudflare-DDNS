@@ -38,13 +38,7 @@
 ################################################################
 # Settings
 ################################################################
-# CloudFlare account authentification key
-AUTH_KEY="<YOUR CF KEY>" # Check on CF: Account > API Key > Global API Key
-# CloudFlare account email
-AUTH_EMAIL="<YOUR CF EMAIL>"
-# Domains to be affected (only of type 'A')
-HOSTNAMES=("<FIRST DNS ENTRY TO BE UPDATED>" "<SECOND ENTRY ...>" "<LAST ENTRY>")
-# Only 'A' records are supported ATM;
+source /settings
 
 ################################################################
 # Script variables (do not change)
@@ -78,7 +72,7 @@ if [ -f "$LAST_IP_FILE" ]; then
     LAST_IP=$(cat "$LAST_IP_FILE")
     echo "Last IP: $LAST_IP"
     
-    if [ $FORCE_DNS_UPDATE -eq 0 ] && [ "$last_ip" == "$current_ip" ]; then
+    if [ $FORCE_DNS_UPDATE -eq 0 ] && [ "$LAST_IP" == "$CURRENT_IP" ]; then
         echo "IP didn't change! Use --force to force dns update ..."
         UPDATE_DNS=0
     else
@@ -86,7 +80,7 @@ if [ -f "$LAST_IP_FILE" ]; then
         UPDATE_DNS=1
     fi
 else
-    echo "Last IP file not found! [$last_ip_file]"
+    echo "Last IP file not found! [$LAST_IP_FILE]"
     echo "Assuming first run -> Updating DNS records"
     UPDATE_DNS=1
 fi
