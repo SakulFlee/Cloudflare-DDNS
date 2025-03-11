@@ -1,7 +1,0 @@
-# CloudFlare account authentification key
-AUTH_KEY="<YOUR CF KEY>" # Check on CF: Account > API Key > Global API Key
-# CloudFlare account email
-AUTH_EMAIL="<YOUR CF EMAIL>"
-# Domains to be affected (only of type 'A')
-HOSTNAMES=("<FIRST DNS ENTRY TO BE UPDATED>" "<SECOND ENTRY ...>" "<LAST ENTRY>")
-# Only 'A' records are supported ATM;
