@@ -1,13 +1,12 @@
-ARG BASE_IMAGE=debian
+ARG BASE_IMAGE=alpine
 ARG BASE_IMAGE_VERSION=latest
 
 FROM ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y bash jq sed dnsutils curl
+RUN apk update && \
+    apk add bash jq sed curl
 
-COPY cf_ddns.sh /cf_ddns.sh
-RUN chmod +x /cf_ddns.sh
+COPY cf_ddns.sh /opt/cf_ddns/cf_ddns.sh
+RUN chmod +x /opt/cf_ddns/cf_ddns.sh
 
-CMD [ "/bin/bash", "/cf_ddns.sh" ]
+CMD [ "/bin/bash", "/opt/cf_ddns/cf_ddns.sh" ]
