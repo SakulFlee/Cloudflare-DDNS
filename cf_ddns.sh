@@ -66,6 +66,9 @@ ZONE_ID=""
 # Type AAAA DNS entries == IPv6
 IPv4_HOSTS=("my-subdomain.domain.tld" "my-other-subdomain.domain.tld")
 IPv6_HOSTS=("my-subdomain.domain.tld" "my-other-subdomain.domain.tld")
+
+# Path to where the last ip cache's are stored
+LAST_IP_CACHE_FOLDER="$CWD/cache"
 EOL
 
     exit -1
@@ -100,8 +103,8 @@ if [ "$IPv6_HOSTS" == "" ]; then
     exit -1
 fi
 
-LAST_IPv4_FILE="$CWD/ipv4.last"
-LAST_IPv6_FILE="$CWD/ipv6.last"
+LAST_IPv4_FILE="$LAST_IP_CACHE_FOLDER/ipv4.last"
+LAST_IPv6_FILE="$LAST_IP_CACHE_FOLDER/ipv6.last"
 
 UPDATE_DNS_IPv4=0
 UPDATE_DNS_IPv6=0
@@ -132,6 +135,14 @@ echo "Found public IPv6: $CURRENT_IPv6"
 ################################################################
 # Read last IP
 ################################################################
+# Make sure the cache directory exists
+mkdir -p "$LAST_IP_CACHE_FOLDER"
+if [ $? -ne 0 ]; then
+    echo "Failed creating last IP cache folder at '$LAST_IP_CACHE_FOLDER'!"
+    
+    exit -1
+fi
+
 if [ -f "$LAST_IPv4_FILE" ]; then
     LAST_IPv4=$(cat "$LAST_IPv4_FILE")
 
