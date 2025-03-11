@@ -1,0 +1,63 @@
+name: Docker - Latest
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAMESPACE: sakul6499-de
+  IMAGE_NAME: cloudflare_ddns
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - base_image: 'alpine:3'
+          - base_image: 'alpine:edge'
+          - base_image: 'alpine:3.21'
+          - base_image: 'alpine:3.20'
+          - base_image: 'alpine:3.19'
+          - base_image: 'alpine:3.18'
+          - base_image: 'alpine:3.17'
+          - base_image: 'ubuntu:latest'
+          - base_image: 'ubuntu:bionic'
+          - base_image: 'ubuntu:focal'
+          - base_image: 'ubuntu:impish'
+          - base_image: 'ubuntu:jammy'
+          - base_image: 'ubuntu:trusty'
+          - base_image: 'ubuntu:xenial'
+          - base_image: 'ubuntu:noble'
+          - base_image: 'debian:latest'
+          - base_image: 'debian:bookworm'
+          - base_image: 'debian:bullseye'
+          - base_image: 'debian:buster'
+          - base_image: 'debian:sid'
+          - base_image: 'debian:stretch'
+          - base_image: 'debian:stable'
+    
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Docker Login
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
+      - name: Docker Build
+        run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.base_image }} --build-arg BASE_IMAGE=${{ matrix.base_image }}
+
+      - name: Docker Push
+        if: ${{ github.event_name != 'pull_request' }}
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.base_image }}
