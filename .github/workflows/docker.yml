@@ -42,8 +42,6 @@ jobs:
           - base_image: 'ubuntu'
             base_image_version: 'focal'
           - base_image: 'ubuntu'
-            base_image_version: 'impish'
-          - base_image: 'ubuntu'
             base_image_version: 'jammy'
           - base_image: 'ubuntu'
             base_image_version: 'trusty'
@@ -61,8 +59,6 @@ jobs:
             base_image_version: 'buster'
           - base_image: 'debian'
             base_image_version: 'sid'
-          - base_image: 'debian'
-            base_image_version: 'stretch'
           - base_image: 'debian'
             base_image_version: 'stable'
     
