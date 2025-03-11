@@ -10,8 +10,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAMESPACE: sakul6499-de
-  IMAGE_NAME: cloudflare_ddns
+  IMAGE_NAMESPACE: SakulFlee
+  IMAGE_NAME: Cloudflare-DDNS
 
 jobs:
   build:
