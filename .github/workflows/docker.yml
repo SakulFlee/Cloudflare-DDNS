@@ -18,28 +18,52 @@ jobs:
     strategy:
       matrix:
         include:
-          - base_image: 'alpine:3'
-          - base_image: 'alpine:edge'
-          - base_image: 'alpine:3.21'
-          - base_image: 'alpine:3.20'
-          - base_image: 'alpine:3.19'
-          - base_image: 'alpine:3.18'
-          - base_image: 'alpine:3.17'
-          - base_image: 'ubuntu:latest'
-          - base_image: 'ubuntu:bionic'
-          - base_image: 'ubuntu:focal'
-          - base_image: 'ubuntu:impish'
-          - base_image: 'ubuntu:jammy'
-          - base_image: 'ubuntu:trusty'
-          - base_image: 'ubuntu:xenial'
-          - base_image: 'ubuntu:noble'
-          - base_image: 'debian:latest'
-          - base_image: 'debian:bookworm'
-          - base_image: 'debian:bullseye'
-          - base_image: 'debian:buster'
-          - base_image: 'debian:sid'
-          - base_image: 'debian:stretch'
-          - base_image: 'debian:stable'
+          - base_image: 'alpine'
+            base_image_version: 'latest'
+          - base_image: 'alpine'
+            base_image_version: '3'
+          - base_image: 'alpine'
+            base_image_version: 'edge'
+          - base_image: 'alpine'
+            base_image_version: '3.21'
+          - base_image: 'alpine'
+            base_image_version: '3.20'
+          - base_image: 'alpine'
+            base_image_version: '3.19'
+          - base_image: 'alpine'
+            base_image_version: '3.18'
+          - base_image: 'alpine'
+            base_image_version: '3.17'
+          - base_image: 'ubuntu'
+            base_image_version: 'latest'
+          - base_image: 'ubuntu'
+            base_image_version: 'bionic'
+          - base_image: 'ubuntu'
+            base_image_version: 'focal'
+          - base_image: 'ubuntu'
+            base_image_version: 'impish'
+          - base_image: 'ubuntu'
+            base_image_version: 'jammy'
+          - base_image: 'ubuntu'
+            base_image_version: 'trusty'
+          - base_image: 'ubuntu'
+            base_image_version: 'xenial'
+          - base_image: 'ubuntu'
+            base_image_version: 'noble'
+          - base_image: 'debian'
+            base_image_version: 'latest'
+          - base_image: 'debian'
+            base_image_version: 'bookworm'
+          - base_image: 'debian'
+            base_image_version: 'bullseye'
+          - base_image: 'debian'
+            base_image_version: 'buster'
+          - base_image: 'debian'
+            base_image_version: 'sid'
+          - base_image: 'debian'
+            base_image_version: 'stretch'
+          - base_image: 'debian'
+            base_image_version: 'stable'
     
     runs-on: ubuntu-latest
 
@@ -56,8 +80,16 @@ jobs:
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
 
       - name: Docker Build
-        run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.base_image }} --build-arg BASE_IMAGE=${{ matrix.base_image }}
+        run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.base_image }}-${{ matrix.base_image_version }} --build-arg BASE_IMAGE=${{ matrix.base_image }}-${{ matrix.base_image_version }}
 
       - name: Docker Push
         if: ${{ github.event_name != 'pull_request' }}
-        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.base_image }}
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.base_image }}-${{ matrix.base_image_version }}
+
+      - name: Tag latest image
+        if: ${{ github.event_name != 'pull_request' && matrix.base_image == 'alpine' && matrix.base_image_version == 'latest' }}
+        run: docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.base_image }}-${{ matrix.base_image_version }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Push latest image
+        if: ${{ github.event_name != 'pull_request' && matrix.base_image == 'alpine' && matrix.base_image_version == 'latest' }}
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest
