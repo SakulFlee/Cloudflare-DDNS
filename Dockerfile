@@ -1,6 +1,7 @@
-ARG BASE_IMAGE=alpine:latest
+ARG BASE_IMAGE=alpine
+ARG BASE_IMAGE_VERSION=latest
 
-FROM ${BASE_IMAGE}
+FROM ${BASE_IMAGE}:${BASE_IMAGE_VERSION}
 
 RUN apk update && \
     apk add bash jq sed curl
