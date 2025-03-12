@@ -209,7 +209,7 @@ fi
 # Update DNS
 ################################################################
 # Exit if no update is required
-if [ $UPDATE_DNS_IPv4 -eq 0 ] || [ $UPDATE_DNS_IPv6 -eq 0 ]; then
+if [ $UPDATE_DNS_IPv4 -eq 0 ] && [ $UPDATE_DNS_IPv6 -eq 0 ]; then
     echo "Neither IPv4, nor IPv6, changed!"
     echo "Call this tool with '--force' to force an update."
 	exit
