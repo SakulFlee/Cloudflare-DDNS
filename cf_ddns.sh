@@ -88,23 +88,29 @@ if [ "$ZONE_ID" == "" ]; then
     
     exit -1
 fi
-if [ "$IPv4_HOSTS" == "" ]; then 
+if [ "$IPv4_HOSTS" == "" ] && [ "$IPv6_HOSTS" == "" ]; then 
     echo "There is an error in your configuration file!"
-    echo "The variable 'IPv4_HOSTS' doesn't seem to be properly set!"
+    echo "The variable 'IPv4_HOSTS' and 'IPv6_HOSTS' doesn't seem to be properly set!" 
     echo "Please review your settings file [$CWD/settings] and rerun this tool!"
-    
-    exit -1
-fi
-if [ "$IPv6_HOSTS" == "" ]; then 
-    echo "There is an error in your configuration file!"
-    echo "The variable 'IPv6_HOSTS' doesn't seem to be properly set!"
-    echo "Please review your settings file [$CWD/settings] and rerun this tool!"
+    echo "It's fine to disable (i.e. unset) either of them, but at least one must exist!"
     
     exit -1
 fi
 
 LAST_IPv4_FILE="$LAST_IP_CACHE_FOLDER/ipv4.last"
 LAST_IPv6_FILE="$LAST_IP_CACHE_FOLDER/ipv6.last"
+
+IPv4_HOST_COUNT=${#IPv4_HOSTS[@]}
+IPv6_HOST_COUNT=${#IPv6_HOSTS[@]}
+
+ENABLE_IPv4=1
+if [ $IPv4_HOST_COUNT -eq 0 ]; then
+    ENABLE_IPv4=0
+fi
+ENABLE_IPv6=1
+if [ $IPv6_HOST_COUNT -eq 0 ]; then
+    ENABLE_IPv6=0
+fi
 
 UPDATE_DNS_IPv4=0
 UPDATE_DNS_IPv6=0
@@ -126,11 +132,27 @@ fi
 ################################################################
 # Query current IP
 ################################################################
-CURRENT_IPv4=$(curl -s -L https://ipv4.icanhazip.com/)
-echo "Found public IPv4: $CURRENT_IPv4"
+if [ $ENABLE_IPv4 -ne 0 ]; then
+    CURRENT_IPv4=$(curl -s -L https://ipv4.icanhazip.com/)
+    if [ $? -ne 0 ]; then
+        echo "Failed retrieving current IPv4! If this continues to fail you should consider listing no IPv4 entries to disable the IPv4 stack."
+        
+        exit -1
+    fi
 
-CURRENT_IPv6=$(curl -s -L https://ipv6.icanhazip.com/)
-echo "Found public IPv6: $CURRENT_IPv6" 
+    echo "Found public IPv4: $CURRENT_IPv4"
+fi
+
+if [ $ENABLE_IPv6 -ne 0 ]; then
+    CURRENT_IPv6=$(curl -s -L https://ipv6.icanhazip.com/)
+    if [ $? -ne 0 ]; then
+        echo "Failed retrieving current IPv6! If this continues to fail you should consider listing no IPv6 entries to disable the IPv6 stack."
+        
+        exit -1
+    fi
+
+    echo "Found public IPv6: $CURRENT_IPv6" 
+fi
 
 ################################################################
 # Read last IP
@@ -143,40 +165,44 @@ if [ $? -ne 0 ]; then
     exit -1
 fi
 
-if [ -f "$LAST_IPv4_FILE" ]; then
-    LAST_IPv4=$(cat "$LAST_IPv4_FILE")
+if [ $ENABLE_IPv4 -ne 0 ]; then
+    if [ -f "$LAST_IPv4_FILE" ]; then
+        LAST_IPv4=$(cat "$LAST_IPv4_FILE")
 
-    if [ "$LAST_IPv4" == "$CURRENT_IPv4" ]; then
-        echo "Last IPv4: $LAST_IPv4 (unchanged)"
+        if [ "$LAST_IPv4" == "$CURRENT_IPv4" ]; then
+            echo "Last IPv4: $LAST_IPv4 (unchanged)"
+        else
+            echo "Last IPv4: $LAST_IPv4 (changed)"
+            
+            UPDATE_DNS_IPv4=1
+        fi
     else
-        echo "Last IPv4: $LAST_IPv4 (changed)"
-        
+        echo "Last IPv4 file not found! [$LAST_IPv4_FILE]"
+        echo "Assuming this is the first run."
+        echo "Forcing DNS update."
+
         UPDATE_DNS_IPv4=1
     fi
-else
-    echo "Last IPv4 file not found! [$LAST_IPv4_FILE]"
-    echo "Assuming this is the first run."
-    echo "Forcing DNS update."
-
-    UPDATE_DNS_IPv4=1
 fi
 
-if [ -f "$LAST_IPv6_FILE" ]; then
-    LAST_IPv6=$(cat "$LAST_IPv6_FILE")
-    
-    if [ "$LAST_IPv6" == "$CURRENT_IPv6" ]; then
-        echo "Last IPv6: $LAST_IPv6 (unchanged)"
+if [ $ENABLE_IPv6 -ne 0 ]; then
+    if [ -f "$LAST_IPv6_FILE" ]; then
+        LAST_IPv6=$(cat "$LAST_IPv6_FILE")
+        
+        if [ "$LAST_IPv6" == "$CURRENT_IPv6" ]; then
+            echo "Last IPv6: $LAST_IPv6 (unchanged)"
+        else
+            echo "Last IPv6: $LAST_IPv6 (changed)"
+
+            UPDATE_DNS_IPv6=1
+        fi
     else
-        echo "Last IPv6: $LAST_IPv6 (changed)"
+        echo "Last IPv6 file not found! [$LAST_IPv6_FILE]"
+        echo "Assuming this is the first run."
+        echo "Forcing DNS update."
 
         UPDATE_DNS_IPv6=1
     fi
-else
-    echo "Last IPv6 file not found! [$LAST_IPv6_FILE]"
-    echo "Assuming this is the first run."
-    echo "Forcing DNS update."
-
-    UPDATE_DNS_IPv6=1
 fi
 
 ################################################################
@@ -206,95 +232,99 @@ DNS_RESULT=$(
         https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records
 )
 
-DNS_A_ENTRIES=$(echo "$DNS_RESULT" | jq '[.result[] | select (.type == "A") | .]')
-DNS_A_ENTRIES_COUNT=$(echo "$DNS_A_ENTRIES" | jq length)
-
-DNS_AAAA_ENTRIES=$(echo "$DNS_RESULT" | jq '[.result[] | select (.type == "AAAA") | .]')
-DNS_AAAA_ENTRIES_COUNT=$(echo "$DNS_AAAA_ENTRIES" | jq length)
-
 # Process Type A/IPv4 entries
-echo "Found $DNS_A_ENTRIES_COUNT DNS Type A entries!"
-echo "DNS Type A hosts to change: ${IPv4_HOSTS[@]}"
-for ((i=0; i<DNS_A_ENTRIES_COUNT; i++)); do
-	id=$(echo "$DNS_A_ENTRIES" | jq ".[$i].id" | sed -e 's/^"//' -e 's/"$//')
-	type=$(echo "$DNS_A_ENTRIES" | jq ".[$i].type" | sed -e 's/^"//' -e 's/"$//')
-	name=$(echo "$DNS_A_ENTRIES" | jq ".[$i].name" | sed -e 's/^"//' -e 's/"$//')
-	proxied=$(echo "$DNS_A_ENTRIES" | jq ".[$i].proxied" | sed -e 's/^"//' -e 's/"$//')
-	echo "> #$id: $name [Type: $type, Proxied: $proxied]"
+if [ $ENABLE_IPv4 -ne 0 ]; then
+    DNS_A_ENTRIES=$(echo "$DNS_RESULT" | jq '[.result[] | select (.type == "A") | .]')
+    DNS_A_ENTRIES_COUNT=$(echo "$DNS_A_ENTRIES" | jq length)
 
-    matched=0
-    for hostname in "${IPv4_HOSTS[@]}"; do
-        if [ "$hostname" == "$name" ]; then
-            matched=1
-            echo "Matched: $hostname!"
+    echo "Found $DNS_A_ENTRIES_COUNT DNS Type A entries!"
+    echo "DNS Type A hosts to change: ${IPv4_HOSTS[@]}"
+    for ((i=0; i<DNS_A_ENTRIES_COUNT; i++)); do
+        id=$(echo "$DNS_A_ENTRIES" | jq ".[$i].id" | sed -e 's/^"//' -e 's/"$//')
+        type=$(echo "$DNS_A_ENTRIES" | jq ".[$i].type" | sed -e 's/^"//' -e 's/"$//')
+        name=$(echo "$DNS_A_ENTRIES" | jq ".[$i].name" | sed -e 's/^"//' -e 's/"$//')
+        proxied=$(echo "$DNS_A_ENTRIES" | jq ".[$i].proxied" | sed -e 's/^"//' -e 's/"$//')
+        echo "> #$id: $name [Type: $type, Proxied: $proxied]"
 
-            # Update entry
-            update_result=$(
-                curl -s \
-                    -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$id" \
-                    -H "Authorization: Bearer $API_KEY" \
-                    -H "Content-Type: application/json" \
-                    --data "{\"type\":\"$type\",\"name\":\"$name\",\"content\":\"$CURRENT_IPv4\",\"proxied\":$proxied}"
-            )
-            success=$(echo "$update_result" | jq ".success" | sed -e 's/^"//' -e 's/"$//')
-            if [ "$success" == "true" ]; then
-                echo "Successfully updated!"
-            else
-                FAILURE_COUNT=$((FAILURE_COUNT + 1))
-                echo "Failed to update!"
+        matched=0
+        for hostname in "${IPv4_HOSTS[@]}"; do
+            if [ "$hostname" == "$name" ]; then
+                matched=1
+                echo "Matched: $hostname!"
 
-                errors=$(echo "$update_result" | jq ".errors")
-                echo "Errors: $errors"
+                # Update entry
+                update_result=$(
+                    curl -s \
+                        -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$id" \
+                        -H "Authorization: Bearer $API_KEY" \
+                        -H "Content-Type: application/json" \
+                        --data "{\"type\":\"$type\",\"name\":\"$name\",\"content\":\"$CURRENT_IPv4\",\"proxied\":$proxied}"
+                )
+                success=$(echo "$update_result" | jq ".success" | sed -e 's/^"//' -e 's/"$//')
+                if [ "$success" == "true" ]; then
+                    echo "Successfully updated!"
+                else
+                    FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                    echo "Failed to update!"
+
+                    errors=$(echo "$update_result" | jq ".errors")
+                    echo "Errors: $errors"
+                fi
             fi
+        done
+
+        if [ $matched -eq 0 ]; then
+            echo "No match!"
         fi
     done
-
-    if [ $matched -eq 0 ]; then
-        echo "No match!"
-    fi
-done
+fi
 
 # Process Type AAAA/IPv6 entries
-echo "Found $DNS_AAAA_ENTRIES_COUNT DNS Type AAAA entries!"
-echo "DNS Type AAAA hosts to change: ${IPv6_HOSTS[@]}"
-for ((i=0; i<DNS_AAAA_ENTRIES_COUNT; i++)); do
-	id=$(echo "$DNS_AAAA_ENTRIES" | jq ".[$i].id" | sed -e 's/^"//' -e 's/"$//')
-	type=$(echo "$DNS_AAAA_ENTRIES" | jq ".[$i].type" | sed -e 's/^"//' -e 's/"$//')
-	name=$(echo "$DNS_AAAA_ENTRIES" | jq ".[$i].name" | sed -e 's/^"//' -e 's/"$//')
-	proxied=$(echo "$DNS_AAAA_ENTRIES" | jq ".[$i].proxied" | sed -e 's/^"//' -e 's/"$//')
-	echo "> #$id: $name [Type: $type, Proxied: $proxied]"
+if [ $ENABLE_IPv6 -ne 0 ]; then
+    DNS_AAAA_ENTRIES=$(echo "$DNS_RESULT" | jq '[.result[] | select (.type == "AAAA") | .]')
+    DNS_AAAA_ENTRIES_COUNT=$(echo "$DNS_AAAA_ENTRIES" | jq length)
 
-    matched=0
-    for hostname in "${IPv6_HOSTS[@]}"; do
-        if [ "$hostname" == "$name" ]; then
-            matched=1
-            echo "Matched: $hostname!"
+    echo "Found $DNS_AAAA_ENTRIES_COUNT DNS Type AAAA entries!"
+    echo "DNS Type AAAA hosts to change: ${IPv6_HOSTS[@]}"
+    for ((i=0; i<DNS_AAAA_ENTRIES_COUNT; i++)); do
+        id=$(echo "$DNS_AAAA_ENTRIES" | jq ".[$i].id" | sed -e 's/^"//' -e 's/"$//')
+        type=$(echo "$DNS_AAAA_ENTRIES" | jq ".[$i].type" | sed -e 's/^"//' -e 's/"$//')
+        name=$(echo "$DNS_AAAA_ENTRIES" | jq ".[$i].name" | sed -e 's/^"//' -e 's/"$//')
+        proxied=$(echo "$DNS_AAAA_ENTRIES" | jq ".[$i].proxied" | sed -e 's/^"//' -e 's/"$//')
+        echo "> #$id: $name [Type: $type, Proxied: $proxied]"
 
-            # Update entry
-            update_result=$(
-                curl -s \
-                    -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$id" \
-                    -H "Authorization: Bearer $API_KEY" \
-                    -H "Content-Type: application/json" \
-                    --data "{\"type\":\"$type\",\"name\":\"$name\",\"content\":\"$CURRENT_IPv6\",\"proxied\":$proxied}"
-            )
-            success=$(echo "$update_result" | jq ".success" | sed -e 's/^"//' -e 's/"$//')
-            if [ "$success" == "true" ]; then
-                echo "Successfully updated!"
-            else
-                FAILURE_COUNT=$((FAILURE_COUNT + 1))
-                echo "Failed to update!"
+        matched=0
+        for hostname in "${IPv6_HOSTS[@]}"; do
+            if [ "$hostname" == "$name" ]; then
+                matched=1
+                echo "Matched: $hostname!"
 
-                errors=$(echo "$update_result" | jq ".errors")
-                echo "Errors: $errors"
+                # Update entry
+                update_result=$(
+                    curl -s \
+                        -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$id" \
+                        -H "Authorization: Bearer $API_KEY" \
+                        -H "Content-Type: application/json" \
+                        --data "{\"type\":\"$type\",\"name\":\"$name\",\"content\":\"$CURRENT_IPv6\",\"proxied\":$proxied}"
+                )
+                success=$(echo "$update_result" | jq ".success" | sed -e 's/^"//' -e 's/"$//')
+                if [ "$success" == "true" ]; then
+                    echo "Successfully updated!"
+                else
+                    FAILURE_COUNT=$((FAILURE_COUNT + 1))
+                    echo "Failed to update!"
+
+                    errors=$(echo "$update_result" | jq ".errors")
+                    echo "Errors: $errors"
+                fi
             fi
+        done
+
+        if [ $matched -eq 0 ]; then
+            echo "No match!"
         fi
     done
-
-    if [ $matched -eq 0 ]; then
-        echo "No match!"
-    fi
-done
+fi
 
 if [ $FAILURE_COUNT -eq 0 ]; then
     echo "Successfully finished!"
