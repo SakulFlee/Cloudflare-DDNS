@@ -39,13 +39,15 @@
 ################################################################
 CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-source "$CWD/settings"
-if [ $? -ne 0 ]; then 
-    echo "A settings file at '$CWD/settings' was not found!"
-    echo "Generating a template settings file ..."
-    echo "Please change the settings as described, then restart this tool!"
-
-    cat > "$CWD/settings" << EOL
+source "/opt/cf_ddns/settings"
+if [ $? -ne 0 ]; then
+	source "$CWD/settings"
+	if [ $? -ne 0 ]; then 
+	    echo "A settings file at '$CWD/settings' was not found!"
+	    echo "Generating a template settings file ..."
+	    echo "Please change the settings as described, then restart this tool!"
+	
+	    cat > "$CWD/settings" << EOL
 # API Key
 # How to obtain:
 # 1. On CloudFlare click on your user in the top right corner.
@@ -70,8 +72,8 @@ IPv6_HOSTS=("my-subdomain.domain.tld" "my-other-subdomain.domain.tld")
 # Path to where the last ip cache's are stored
 LAST_IP_CACHE_FOLDER="$CWD/cache"
 EOL
-
-    exit -1
+	    exit -1
+	fi
 fi
 
 if [ "$API_KEY" == "" ]; then 
