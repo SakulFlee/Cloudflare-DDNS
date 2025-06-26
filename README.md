@@ -42,7 +42,7 @@ docker run -it \
     --mount type=bind,source="$(pwd)"/ipv4.last,target=/opt/cf_ddns/ipv4.last \
     --mount type=bind,source="$(pwd)"/ipv6.last,target=/opt/cf_ddns/ipv6.last \
     --mount type=bind,source="$(pwd)"/settings,target=/opt/cf_ddns/settings \
-    ghcr.io/sakul6499/cloudflare_ddns:latest
+    ghcr.io/sakulflee/cloudflare-ddns:alpine-3.21
 ```
 
 > [!NOTE]  
@@ -59,7 +59,7 @@ docker create -it \
     --mount type=bind,source="$(pwd)"/ipv4.last,target=/opt/cf_ddns/ipv4.last \
     --mount type=bind,source="$(pwd)"/ipv6.last,target=/opt/cf_ddns/ipv6.last \
     --mount type=bind,source="$(pwd)"/settings,target=/opt/cf_ddns/settings \
-    ghcr.io/sakul6499/cloudflare_ddns:latest
+    ghcr.io/sakulflee/cloudflare-ddns:alpine-3.21
 ```
 
 And every iteration simply call:
