@@ -15,7 +15,7 @@ RUN if [ -f /etc/alpine-release ]; then \
         exit -1; \
     fi
 
-COPY cf_ddns.sh /opt/cf_ddns/cf_ddns.sh
-RUN chmod +x /opt/cf_ddns/cf_ddns.sh
+COPY cf_ddns.sh /cf_ddns.sh
+RUN chmod +x /cf_ddns.sh
 
-CMD [ "/bin/bash", "/opt/cf_ddns/cf_ddns.sh" ]
+CMD [ "/bin/bash", "/cf_ddns.sh" ]
