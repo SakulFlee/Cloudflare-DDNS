@@ -58,8 +58,6 @@ jobs:
           - base_image: 'debian'
             base_image_version: 'bullseye'
           - base_image: 'debian'
-            base_image_version: 'buster'
-          - base_image: 'debian'
             base_image_version: 'sid'
           - base_image: 'debian'
             base_image_version: 'stable'
